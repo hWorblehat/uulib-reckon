@@ -1,0 +1,9 @@
+wrapper {
+	gradleVersion = '4.2'
+}
+
+allprojects {
+	repositories {
+		jcenter()
+	}
+}

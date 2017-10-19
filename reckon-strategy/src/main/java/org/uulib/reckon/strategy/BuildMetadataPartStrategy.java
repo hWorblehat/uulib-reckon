@@ -6,7 +6,7 @@ import org.ajoberstar.reckon.core.VcsInventory;
 
 /**
  * Classes that implement this interface are used to determine the build metadata part of versions reckoned
- * using {@linkplain CompoundStagePreReleaseStrategy}.
+ * using {@linkplain CompoundPreReleaseStrategy}.
  * 
  * @author hWorblehat
  */

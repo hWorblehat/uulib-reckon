@@ -9,11 +9,26 @@ import org.uulib.reckon.util.ConstantSupplier;
 
 import com.github.zafarkhaja.semver.Version;
 
+/**
+ * A {@linkplain PreReleaseStrategy} that separates the reckoning of the version's
+ * {@linkplain Version#getPreReleaseVersion() pre-release version part} and its
+ * {@linkplain Version#getBuildMetadata() build metadata}. This is achieved by delegating to
+ * a {@linkplain PreReleasePartStrategy} and {@linkplain BuildMetadataPartStrategy} respectively.
+ * 
+ * @author hWorblehat
+ */
 public class CompoundPreReleaseStrategy implements PreReleaseStrategy {
 	
 	private final Supplier<PreReleasePartStrategy> preReleasePart;
 	private final Supplier<BuildMetadataPartStrategy> buildMetadataPart;
 	
+	/**
+	 * Creates a new CompoundPreReleaseStrategy.
+	 * @param preReleasePart A supplier of the {@linkplain PreReleasePartStrategy} to use.
+	 * @param buildMetadataPart A supplier of the {@linkplain BuildMetadataPartStrategy} to use.
+	 * 
+	 * @see #builder()
+	 */
 	public CompoundPreReleaseStrategy(Supplier<PreReleasePartStrategy> preReleasePart,
 			Supplier<BuildMetadataPartStrategy> buildMetadataPart) {
 		this.preReleasePart = Objects.requireNonNull(preReleasePart);
@@ -48,6 +63,11 @@ public class CompoundPreReleaseStrategy implements PreReleaseStrategy {
 		return new Builder(Objects.requireNonNull(preReleasePart));
 	}
 	
+	/**
+	 * A builder of instances of {@linkplain CompoundPreReleaseStrategy}.
+	 * 
+	 * @author hWorblehat
+	 */
 	public static class Builder {
 		
 		private Supplier<PreReleasePartStrategy> preReleasePart;

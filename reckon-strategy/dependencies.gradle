@@ -4,9 +4,5 @@ dependencies {
 	api (
 		'org.ajoberstar.reckon:reckon-core:0.2.1'
 	)
-	
-	implementation (
-		'com.github.tony19:named-regexp:0.2.5'
-	)
 
 }

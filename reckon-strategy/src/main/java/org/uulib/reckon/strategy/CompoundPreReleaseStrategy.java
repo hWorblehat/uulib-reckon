@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 import org.ajoberstar.reckon.core.PreReleaseStrategy;
 import org.ajoberstar.reckon.core.VcsInventory;
-import org.uulib.reckon.util.ConstantSupplier;
+import org.uulib.util.ConstantSupplier;
 
 import com.github.zafarkhaja.semver.Version;
 

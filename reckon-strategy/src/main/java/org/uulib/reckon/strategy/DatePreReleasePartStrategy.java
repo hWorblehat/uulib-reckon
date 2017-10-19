@@ -65,7 +65,7 @@ public class DatePreReleasePartStrategy implements PreReleasePartStrategy {
 	}
 
 	@Override
-	public Optional<String> reckonPreRelease(VcsInventory inventory, Version normalVersion, String stage) {
+	public Optional<String> reckonPreRelease(VcsInventory inventory, Version normalVersion) {
 		Set<String> claimedPreReleases = inventory.getClaimedVersions().stream()
 				.filter(v -> normalVersion.equals(Versions.getNormal(v)))
 				.map(Version::getPreReleaseVersion)

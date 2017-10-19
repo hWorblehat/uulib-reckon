@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 import org.ajoberstar.reckon.core.PreReleaseStrategy;
 import org.ajoberstar.reckon.core.VcsInventory;
-
 import com.github.zafarkhaja.semver.Version;
 
 /**
@@ -41,17 +40,12 @@ public class CompoundStagePreReleaseStrategy implements PreReleaseStrategy {
 	public static final String DEFAULT_FINAL_STAGE = "final";
 	
 	private final String defaultStage;
-	private final PreReleasePartStrategy defaultPreReleasePartStrategy;
-	private final BuildMetadataPartStrategy defaultBuildInfoPartStrategy;
-	private final Map<String, PreReleaseReckoners> specificReckoners;
+	private final Map<String, CompoundPreReleaseStrategy> specificReckoners;
 	private final Supplier<Optional<String>> stageSupplier;
 	
-	private CompoundStagePreReleaseStrategy(String defaultStage, PreReleasePartStrategy defaultPreReleasePartStrategy,
-			BuildMetadataPartStrategy defaultBuildInfoPartStrategy, Map<String, PreReleaseReckoners> specificReckoners,
-			Supplier<Optional<String>> stageSupplier) {
+	private CompoundStagePreReleaseStrategy(String defaultStage,
+			Map<String, CompoundPreReleaseStrategy> specificReckoners, Supplier<Optional<String>> stageSupplier) {
 		this.defaultStage = defaultStage;
-		this.defaultPreReleasePartStrategy = defaultPreReleasePartStrategy;
-		this.defaultBuildInfoPartStrategy = defaultBuildInfoPartStrategy;
 		this.specificReckoners = specificReckoners;
 		this.stageSupplier = stageSupplier;
 	}
@@ -72,38 +66,13 @@ public class CompoundStagePreReleaseStrategy implements PreReleaseStrategy {
 	 */
 	public Version reckonTargetVersion(VcsInventory inventory, Version targetNormal, Optional<String> stageOptional) {
 		String stage = stageOptional.orElse(defaultStage);
-		PreReleaseReckoners specificStrategies = specificReckoners.get(stage);
+		CompoundPreReleaseStrategy specificStrategies = specificReckoners.get(stage);
 		if(specificStrategies==null) {
 			throw new IllegalArgumentException(
 					String.format("Stage '%s' is not one of %s", stage, specificReckoners.keySet()));
 		}
 		
-		Version withPreRelease = specificStrategies.preReleasePartStrategy
-				.orElse(defaultPreReleasePartStrategy)
-				.reckonPreRelease(inventory, targetNormal, stage)
-				.map(targetNormal::setPreReleaseVersion)
-				.orElse(targetNormal);
-				
-		Version withBuildMetadata = specificStrategies.buildInfoPartStrategy
-				.orElse(defaultBuildInfoPartStrategy)
-				.reckonBuildMetadata(inventory)
-				.map(withPreRelease::setBuildMetadata)
-				.orElse(withPreRelease);
-		
-		return withBuildMetadata;
-	}
-	
-	private static class PreReleaseReckoners {
-		Optional<PreReleasePartStrategy> preReleasePartStrategy = Optional.empty();
-		Optional<BuildMetadataPartStrategy> buildInfoPartStrategy = Optional.empty();
-		
-		void setPreReleasePartStrategy(PreReleasePartStrategy strategy) {
-			this.preReleasePartStrategy = Optional.of(strategy);
-		}
-		
-		void setBuildMetadataPartStrategy(BuildMetadataPartStrategy strategy) {
-			this.buildInfoPartStrategy = Optional.of(strategy);
-		}
+		return specificStrategies.reckonTargetVersion(inventory, targetNormal);
 	}
 	
 	/**
@@ -136,17 +105,24 @@ public class CompoundStagePreReleaseStrategy implements PreReleaseStrategy {
 		private String developmentStage = DEFAULT_DEVELOPMENT_STAGE;
 		private String finalStage = DEFAULT_FINAL_STAGE;
 		
-		private PreReleaseReckoners devReckoners = new PreReleaseReckoners();
-		private PreReleaseReckoners finalReckoners = new PreReleaseReckoners();
-		
-		private PreReleasePartStrategy defaultPreReleasePartStrategy = new NumberedStagePreReleasePartStrategy();
+		private PreReleasePartStrategy defaultPreReleasePartStrategy = null;
 		private BuildMetadataPartStrategy defaultBuildMetadataPartStrategy = BuildMetadataPartStrategy.NONE;
 		
-		private Map<String, PreReleaseReckoners> preReleaseStages = new HashMap<>(0);
+		private final Supplier<PreReleasePartStrategy> defaultPreReleasePart =
+				() -> defaultPreReleasePartStrategy;
+		private final Supplier<BuildMetadataPartStrategy> defaultBuildMetadataPart =
+				() -> defaultBuildMetadataPartStrategy;
 		
-		private Builder() {
-			finalReckoners.setPreReleasePartStrategy(PreReleasePartStrategy.NONE);
-		}
+		private CompoundPreReleaseStrategy.Builder devReckoners = CompoundPreReleaseStrategy.builder()
+				.setPreReleasePart(defaultPreReleasePart)
+				.setBuildMetadataPart(defaultBuildMetadataPart);
+		
+		private CompoundPreReleaseStrategy.Builder finalReckoners = CompoundPreReleaseStrategy.builder()
+				.setPreReleasePart(PreReleasePartStrategy.NONE)
+				.setBuildMetadataPart(defaultBuildMetadataPart);
+		
+		private Map<String, CompoundPreReleaseStrategy.Builder> preReleaseStages = new HashMap<>(0);
+
 		
 		/**
 		 * Sets the name of the stage to use to indicate a 'final' release.
@@ -205,10 +181,12 @@ public class CompoundStagePreReleaseStrategy implements PreReleaseStrategy {
 				}
 			}
 			
-			Map<String, PreReleaseReckoners> preReleaseStages = Stream.of(stages).collect(Collectors.toMap(
-					Function.identity(),
-					s -> Optional.ofNullable(this.preReleaseStages.get(s)).orElseGet(PreReleaseReckoners::new)
-			));
+			Map<String, CompoundPreReleaseStrategy.Builder> preReleaseStages = Stream.of(stages).collect(
+					Collectors.toMap(Function.identity(), s -> Optional
+							.ofNullable(this.preReleaseStages.get(s))
+							.orElseGet(() -> CompoundPreReleaseStrategy.builder()
+									.setPreReleasePart(defaultPreReleasePart)
+									.setBuildMetadataPart(defaultBuildMetadataPart))));
 			
 			for(String s: new String[] {developmentStage, finalStage}) {
 				if(preReleaseStages.containsKey(s)) {
@@ -266,7 +244,7 @@ public class CompoundStagePreReleaseStrategy implements PreReleaseStrategy {
 						"The pre-release part strategy for the final stage '" + stage + "' cannot be changed.");
 			}
 			
-			getReckonersFor(stage).setPreReleasePartStrategy(strategy);
+			getReckonersFor(stage).setPreReleasePart(strategy);
 			return this;
 		}
 		
@@ -292,7 +270,7 @@ public class CompoundStagePreReleaseStrategy implements PreReleaseStrategy {
 		 * @see #setFinalBuildMetadataStrategy(BuildMetadataPartStrategy)
 		 */
 		public Builder setPreReleaseBuildMetadataStrategy(String stage, BuildMetadataPartStrategy strategy) {
-			getReckonersFor(stage).setBuildMetadataPartStrategy(strategy);
+			getReckonersFor(stage).setBuildMetadataPart(strategy);
 			return this;
 		}
 		
@@ -318,8 +296,8 @@ public class CompoundStagePreReleaseStrategy implements PreReleaseStrategy {
 			return setPreReleaseBuildMetadataStrategy(finalStage, strategy);
 		}
 		
-		private PreReleaseReckoners getReckonersFor(String stage) {
-			PreReleaseReckoners reck = preReleaseStages.get(stage);
+		private CompoundPreReleaseStrategy.Builder getReckonersFor(String stage) {
+			CompoundPreReleaseStrategy.Builder reck = preReleaseStages.get(stage);
 			if(reck!=null) {
 				return reck;
 			} else if(developmentStage.equals(stage)) {
@@ -338,13 +316,17 @@ public class CompoundStagePreReleaseStrategy implements PreReleaseStrategy {
 		 * @return The built strategy.
 		 */
 		public CompoundStagePreReleaseStrategy build(Supplier<Optional<String>> stageSupplier) {
-			Map<String, PreReleaseReckoners> stages = new HashMap<>(preReleaseStages.size() + 2);
-			stages.put(developmentStage, devReckoners);
-			stages.put(finalStage, finalReckoners);
-			stages.putAll(preReleaseStages);
+			if(defaultPreReleasePartStrategy==null) {
+				defaultPreReleasePartStrategy =
+						NumberedStagePreReleasePartStrategy.forStageOrDefault(stageSupplier, developmentStage);
+			}
 			
-			return new CompoundStagePreReleaseStrategy(developmentStage, defaultPreReleasePartStrategy,
-					defaultBuildMetadataPartStrategy, stages, stageSupplier);
+			Map<String, CompoundPreReleaseStrategy> stages = new HashMap<>(preReleaseStages.size() + 2);
+			stages.put(developmentStage, devReckoners.build());
+			stages.put(finalStage, finalReckoners.build());
+			preReleaseStages.forEach((k,v) -> stages.put(k, v.build()));
+			
+			return new CompoundStagePreReleaseStrategy(developmentStage, stages, stageSupplier);
 		}
 		
 		/**

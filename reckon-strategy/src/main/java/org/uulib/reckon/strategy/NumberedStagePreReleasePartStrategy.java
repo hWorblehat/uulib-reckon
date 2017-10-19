@@ -1,6 +1,8 @@
 package org.uulib.reckon.strategy;
 
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -18,13 +20,40 @@ import com.github.zafarkhaja.semver.Version;
 public class NumberedStagePreReleasePartStrategy implements PreReleasePartStrategy {
 	
 	private static final Pattern STAGE_REGEX = Pattern.compile("^(?<name>\\w+)\\.(?<num>\\d+)");
+	
+	private final Supplier<String> stageSupplier;
+	
+	public static NumberedStagePreReleasePartStrategy forStageOrBlank(Supplier<Optional<String>> stageSupplier) {
+		return forStageOrDefault(stageSupplier, "");
+	}
+	
+	public static NumberedStagePreReleasePartStrategy forStageOrDefault(
+			Supplier<Optional<String>> stageSupplier, String defaultStage) {
+		Objects.requireNonNull(stageSupplier);
+		Objects.requireNonNull(defaultStage);
+		
+		return new NumberedStagePreReleasePartStrategy(() -> stageSupplier.get().orElse(defaultStage));
+	}
+	
+	public static NumberedStagePreReleasePartStrategy forStage(String stage) {
+		return new NumberedStagePreReleasePartStrategy(() -> stage);
+	}
+	
+	public static NumberedStagePreReleasePartStrategy forStage(Supplier<String> stageSupplier) {
+		return new NumberedStagePreReleasePartStrategy(Objects.requireNonNull(stageSupplier));
+	}
+	
+	protected NumberedStagePreReleasePartStrategy(Supplier<String> stageSupplier) {
+		this.stageSupplier = stageSupplier;
+	}
 
 	@Override
-	public Optional<String> reckonPreRelease(VcsInventory inventory, Version normalVersion, String stage) {
+	public Optional<String> reckonPreRelease(VcsInventory inventory, Version normalVersion) {
 		Stream<String> existingPreReleases = inventory.getClaimedVersions().stream()
 				.filter(v -> normalVersion.equals(Versions.getNormal(v)))
 				.map(Version::getPreReleaseVersion);
-				
+		
+		String stage = stageSupplier.get();
 		return Optional.of(stage.isEmpty()
 				? reckonWithBlankStage(existingPreReleases)
 				: reckonWithStage(existingPreReleases, stage));

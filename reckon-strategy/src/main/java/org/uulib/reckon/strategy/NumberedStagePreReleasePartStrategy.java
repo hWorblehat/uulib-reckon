@@ -9,6 +9,12 @@ import org.ajoberstar.reckon.core.Versions;
 
 import com.github.zafarkhaja.semver.Version;
 
+/**
+ * A {@linkplain PreReleasePartStrategy} that formats pre-release version parts as {@code <stage>.<number>}, where
+ * the number is incremented for each new version using the same normal version and stage.
+ * 
+ * @author hWorblehat
+ */
 public class NumberedStagePreReleasePartStrategy implements PreReleasePartStrategy {
 	
 	private static final Pattern STAGE_REGEX = Pattern.compile("^(?<name>\\w+)\\.(?<num>\\d+)");

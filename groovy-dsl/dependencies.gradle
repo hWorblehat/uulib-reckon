@@ -9,7 +9,7 @@ dependencies {
 
 	api (
 		'org.codehaus.groovy:groovy-all:2.4.12',
-		project(':reckonStrategy')
+		project(':strategy')
 	)
 	
 	testImplementation('org.spockframework:spock-core:1.1-+') {

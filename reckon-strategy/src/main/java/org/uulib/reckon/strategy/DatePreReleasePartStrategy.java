@@ -1,6 +1,7 @@
 package org.uulib.reckon.strategy;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
@@ -33,9 +34,10 @@ import com.github.zafarkhaja.semver.Version;
  */
 public class DatePreReleasePartStrategy implements PreReleasePartStrategy {
 	
-	private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
-	private static final DateTimeFormatter HOUR_MINUTE_SECOND = DateTimeFormatter.ofPattern("HHmmss");
-	private static final DateTimeFormatter MILLISECOND = DateTimeFormatter.ofPattern("SSS");
+	private static final ZoneId UTC = ZoneId.of("UTC");
+	private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("uuuuMMdd").withZone(UTC);
+	private static final DateTimeFormatter HOUR_MINUTE_SECOND = DateTimeFormatter.ofPattern("HHmmss").withZone(UTC);
+	private static final DateTimeFormatter MILLISECOND = DateTimeFormatter.ofPattern("SSS").withZone(UTC);
 	
 	private final Supplier<Instant> timestampSupplier;
 	private final DateTimeFormatter[] formats;

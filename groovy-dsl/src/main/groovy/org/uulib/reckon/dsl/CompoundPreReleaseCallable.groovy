@@ -10,10 +10,10 @@ import org.uulib.util.Configurator
 import groovy.transform.PackageScope
 import groovy.transform.TupleConstructor
 
-@TupleConstructor(includeFields=true)
+@TupleConstructor
 @PackageScope final class CompoundPreReleaseCallable implements Callable<CompoundPreReleaseStrategy> {
 
-	private final Configurator<CompoundPreReleaseSpec> config
+	final Configurator<CompoundPreReleaseSpec> config
 
 	@Override
 	CompoundPreReleaseStrategy call() throws Exception {

@@ -1,9 +1,15 @@
 wrapper {
-	gradleVersion = '4.2.1'
+	gradleVersion = '4.3'
 }
 
 allprojects {
 	repositories {
 		jcenter()
+	}
+	
+	pluginManager.withPlugin('java') {
+		jar {
+			archiveName = "${rootProject.name}-${projectDir.name}.jar"
+		}
 	}
 }

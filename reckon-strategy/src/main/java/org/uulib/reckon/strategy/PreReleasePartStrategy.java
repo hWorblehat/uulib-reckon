@@ -18,7 +18,7 @@ public interface PreReleasePartStrategy {
 	/**
 	 * A {@linkplain PreReleasePartStrategy} that always reckons there should be no pre-release information.
 	 */
-	public static final PreReleasePartStrategy NONE = (i,v) -> Optional.empty();
+	public static final PreReleasePartStrategy NONE = ConstantPartStrategy.NONE;
 	
 	/**
 	 * Determines the pre-release information to append to the given normal version.

@@ -16,7 +16,7 @@ public interface BuildMetadataPartStrategy {
 	/**
 	 * A {@linkplain BuildMetadataPartStrategy} that always reckons there should be no build metadata.
 	 */
-	public static final BuildMetadataPartStrategy NONE = i -> Optional.empty();
+	public static final BuildMetadataPartStrategy NONE = ConstantPartStrategy.NONE;
 	
 	/**
 	 * A {@linkplain BuildMetadataPartStrategy} that uses the current commit ID from the VCS inventory as the

@@ -1,0 +1,16 @@
+plugins {
+	id 'java-library'
+	id 'groovy'
+}
+
+configurations {
+	apiElements {
+		outgoing.variants.getByName('classes').artifact(
+			file: compileGroovy.destinationDir,
+			type: ArtifactTypeDefinition.JVM_CLASS_DIRECTORY,
+			builtBy: compileGroovy
+		)
+	}
+}
+
+apply from: 'dependencies.gradle'

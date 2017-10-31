@@ -2,7 +2,7 @@
 rootProject.name = 'uulib-reckon'
 
 
-['reckonStrategy'].each { String projectName ->
+['reckonStrategy', 'reckonGroovyDsl'].each { String projectName ->
 	include projectName
 	String dirName = projectName.replaceAll('\\p{Upper}') { "-${it.toLowerCase()}" }
 	project(":$projectName").projectDir = new File(settingsDir, dirName)

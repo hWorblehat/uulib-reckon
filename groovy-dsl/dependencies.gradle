@@ -12,7 +12,8 @@ dependencies {
 
 	api (
 		"org.codehaus.groovy:groovy-all:${groovyVersion}",
-		project(':strategy')
+		project(':strategy'),
+		'org.ajoberstar:grgit:2.1.0'
 	)
 	
 	testImplementation("org.spockframework:spock-core:1.1-groovy-${groovyMajorMinor}") {

@@ -7,7 +7,7 @@ import org.uulib.util.Configurator
 
 import groovy.transform.PackageScope
 
-class ReckonSpec implements VersionStrategies, CompoundStrategies, PartStrategies, BasedOn {
+class ReckonSpec implements VersionStrategies, CompoundStrategies, PartStrategies, BasedOn, VcsInventories {
 
 	def vcs
 	def normalVersion

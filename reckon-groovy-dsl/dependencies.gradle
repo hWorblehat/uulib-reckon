@@ -1,9 +1,23 @@
 
+configurations.all {
+	resolutionStrategy.dependencySubstitution {
+		substitute module('commons-logging:commons-logging') with module("org.slf4j:jcl-over-slf4j:1.7.+")
+	}
+}
+
 dependencies {
 
 	api (
 		'org.codehaus.groovy:groovy-all:2.4.12',
 		project(':reckonStrategy')
+	)
+	
+	testImplementation('org.spockframework:spock-core:1.1-+') {
+		exclude module: 'groovy-all'
+	}
+	
+	testImplementation(
+		'org.slf4j:slf4j-simple:1.7.+'
 	)
 
 }

@@ -1,0 +1,28 @@
+plugins {
+	id 'java-gradle-plugin'
+	id 'java-library'
+	id 'groovy'
+}
+
+configurations {
+	apiElements {
+		outgoing.variants.getByName('classes').artifact(
+			file: compileGroovy.destinationDir,
+			type: ArtifactTypeDefinition.JVM_CLASS_DIRECTORY,
+			builtBy: compileGroovy
+		)
+	}
+}
+
+description = 'Pluing to add UULIB Reckon functionality to Gradle builds'
+
+apply from: 'dependencies.gradle'
+
+gradlePlugin {
+	plugins {
+		reckon {
+			id = "org.uulib.reckon"
+			implementationClass = 'org.uulib.reckon.ReckonGradlePlugin'
+		}
+	}
+}

@@ -2,7 +2,7 @@
 rootProject.name = 'reckon'
 
 
-['strategy', 'groovyDsl'].each { String projectName ->
+['strategy', 'groovyDsl', 'gradlePlugin'].each { String projectName ->
 	include projectName
 	String dirName = projectName.replaceAll('\\p{Upper}') { "-${it.toLowerCase()}" }
 	project(":$projectName").projectDir = new File(settingsDir, dirName)

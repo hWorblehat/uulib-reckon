@@ -1,19 +1,20 @@
 
 configurations.all {
+	
 	resolutionStrategy.dependencySubstitution {
 		substitute module('commons-logging:commons-logging') with module("org.slf4j:jcl-over-slf4j:1.7.+")
 	}
+	
+	exclude module: 'groovy-all'
 }
 
 dependencies {
 
 	api (
-		project(':groovyDsl')
+		project(':groovyDsl'),
+		gradleApi(),
+		localGroovy()
 	)
-	
-	testImplementation("org.spockframework:spock-core:1.1-groovy-2.4") {
-		exclude module: 'groovy-all'
-	}
 	
 	testImplementation(
 		'org.slf4j:slf4j-simple:1.7.+'

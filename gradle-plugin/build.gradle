@@ -22,7 +22,7 @@ gradlePlugin {
 	plugins {
 		reckon {
 			id = "org.uulib.reckon"
-			implementationClass = 'org.uulib.reckon.ReckonGradlePlugin'
+			implementationClass = 'org.uulib.reckon.gradle.ReckonGradlePlugin'
 		}
 	}
 }

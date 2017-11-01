@@ -18,6 +18,10 @@ description = 'Pluing to add UULIB Reckon functionality to Gradle builds'
 
 apply from: 'dependencies.gradle'
 
+tasks.withType(Test) {
+	systemProperty('org.uulib.compatibleGradleVersions', '4.3')
+}
+
 gradlePlugin {
 	plugins {
 		reckon {

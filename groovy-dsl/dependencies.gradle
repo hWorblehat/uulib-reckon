@@ -16,11 +16,8 @@ dependencies {
 		'org.ajoberstar:grgit:2.1.0'
 	)
 	
-	testImplementation("org.spockframework:spock-core:1.1-groovy-${groovyMajorMinor}") {
-		exclude module: 'groovy-all'
-	}
-	
 	testImplementation(
+		"org.spockframework:spock-core:1.1-groovy-${groovyMajorMinor}",
 		'org.slf4j:slf4j-simple:1.7.+',
 		project(path: ':strategy', configuration: 'testFixtures')
 	)

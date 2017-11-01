@@ -39,8 +39,7 @@ import groovy.transform.TupleConstructor
 			case VcsInventory: return {vcsInventory} as VcsInventorySupplier
 
 			case null: throw new IllegalStateException('VCS inventory not set.')
-			default: throw new IllegalStateException(
-			"Don't know how to interpret VCS inventory: $vcsInventory")
+			default: throw illegalType('VCS inventory', vcsInventory)
 		}
 	}
 
@@ -54,8 +53,7 @@ import groovy.transform.TupleConstructor
 				return VersionStrategies.version(normalStrategy)
 
 			case null: throw new IllegalStateException('Normal strategy not set.')
-			default: throw new IllegalStateException(
-			"Don't know how to interpret normal strategy: $normalStrategy")
+			default: throw illegalType('normal strategy', normalStrategy)
 		}
 	}
 
@@ -71,9 +69,12 @@ import groovy.transform.TupleConstructor
 
 			case null: return VersionStrategies.none
 
-			default: throw new IllegalStateException(
-			"Don't know how to interpret pre-release strategy: $preReleaseStrategy")
+			default: throw illegalType('pre-release strategy', preReleaseStrategy)
 		}
+	}
+	
+	private static IllegalStateException illegalType(String desc, def val) {
+		return new IllegalStateException("Don't know how to interpret $desc '$val' of type '${val.class}'")
 	}
 
 }

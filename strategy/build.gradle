@@ -3,6 +3,7 @@ plugins {
 }
 
 description = 'Strategies for org.ajoberstar.reckon'
+ext.basePackage = 'org.uulib.reckon.strategy'
 
 sourceSets {
 	testFixtures

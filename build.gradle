@@ -1,6 +1,5 @@
 plugins {
 	id 'org.ajoberstar.grgit'
-	id 'org.uulib.gittag' apply false
 }
 
 allprojects {
@@ -13,49 +12,13 @@ wrapper {
 	gradleVersion = '4.3'
 }
 
-def buildTime = Instant.now()
+ext.buildTime = Instant.now()
 
-def gradleScripts = ['subprojects', 'documentation', 'publish'].collect {
+def gradleScripts = ['subprojects', 'versioning', 'documentation', 'publish'].collect {
 	file("gradle/${it}.gradle")
 }
 
 subprojects {
-	apply plugin: 'org.uulib.reckon'
-	apply plugin: 'org.uulib.gittag'
-	
-	if(project.status=='release' || project.status=='integration') {
-		project.status = 'development'
-	}
-	
-	reckon {
-		vcs = git(rootProject.grgit).withTagsMatching ~/${project.name}-(.+)/
-		
-		def stage = projectProperty 'status'
-		def scope = projectProperty "${project.name}.scope" or 'scope' orElse 'patch'
-		
-		normalVersion = basedOn(stage) {
-			normally scopedUsing(scope)
-			when 'development' then '0.0.0'
-		}
-		
-		preReleaseVersion = basedOn(stage) {
-			normally stageUsing(stage)
-			when 'final' then none
-			when 'development' then compound {
-				preRelease = timestamp(buildTime)
-				buildMetadata = commitId
-			}
-		}
-	}
-	
-	gradletag {
-		tags {
-			versionTag {
-				tag = project.version
-			}
-		}
-	}
-	
 	for(s in gradleScripts) {
 		apply from: s
 	}

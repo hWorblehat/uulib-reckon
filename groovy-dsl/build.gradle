@@ -4,6 +4,7 @@ plugins {
 }
 
 description = 'A groovy DSL for reckoning versions'
+ext.basePackage = 'org.uulib.reckon.dsl'
 
 configurations {
 	apiElements {

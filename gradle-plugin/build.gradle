@@ -2,6 +2,7 @@ plugins {
 	id 'java-gradle-plugin'
 	id 'java-library'
 	id 'groovy'
+	id 'com.gradle.plugin-publish' version '0.9.9'
 }
 
 configurations {
@@ -15,6 +16,7 @@ configurations {
 }
 
 description = 'Pluing to add UULIB Reckon functionality to Gradle builds'
+ext.basePackage = 'org.uulib.reckon.gradle'
 
 apply from: 'dependencies.gradle'
 
@@ -27,6 +29,18 @@ gradlePlugin {
 		reckon {
 			id = "org.uulib.reckon"
 			implementationClass = 'org.uulib.reckon.gradle.ReckonGradlePlugin'
+		}
+	}
+}
+
+pluginBundle {
+	description = project.description
+	tags = ['reckon', 'label', 'version', 'vcs', 'scm', 'git']
+	
+	plugins {
+		reckon {
+			id = gradlePlugin.plugins.reckon.id
+			displayName = "UULIB Reckon Gradle Plugin"
 		}
 	}
 }

@@ -1,0 +1,27 @@
+repositories {
+	jcenter()
+}
+
+ext.moduleName = "${rootProject.name}-${projectDir.name}"
+
+pluginManager.withPlugin('java') {
+	sourceCompatibility = '1.8'
+	targetCompatibility = '1.8'
+	
+	jar {
+		baseName = project.moduleName
+		
+		doFirst {
+			manifest.attributes (
+				'Name':                   project.basePackage.replace('.', '/'),
+				'Created-By':             'uulib',
+				'Specification-Title':    project.description,
+				'Specification-Version':  project.version,
+				'Specification-Vendor':   'uulib',
+				'Implementation-Title':   project.basePackage,
+				'Implementation-Version': project.version,
+				'Implementation-Vendor':  'uulib'
+			)
+		}
+	}
+}

@@ -1,0 +1,20 @@
+allprojects {
+	pluginManager.withPlugin('java') {
+		build.dependsOn.remove('check')
+		build.dependsOn.remove('assemble')
+		build.dependsOn 'jar'
+	}
+}
+
+description = 'buildSrc project for dependencies only'
+ext.basePackage = 'org.uulib.reckon.buildSrc'
+
+File subprojectsGradle = file('../gradle/subprojects.gradle')
+
+allprojects {
+	apply from: subprojectsGradle
+}
+
+dependencies {
+	runtime project(':gradlePlugin')
+}

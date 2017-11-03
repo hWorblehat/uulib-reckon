@@ -1,0 +1,11 @@
+
+pluginManager.withPlugin('java') {
+
+	task sourcesJar(type: Jar) {
+		baseName = project.moduleName
+		classifier = 'sources'
+
+		from(project.sourceSets.main.allSource)
+	}
+
+}

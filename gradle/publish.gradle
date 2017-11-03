@@ -1,0 +1,82 @@
+buildscript {
+	repositories {
+		jcenter()
+	}
+	dependencies {
+		classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+	}
+}
+
+def githubRepoLocation = 'uulib/reckon'
+def githubProjectUrl = "https://github.com/${githubRepoLocation}"
+def githubRepoUrl = "${githubProjectUrl}.git"
+
+task release {
+	group = "Publishing"
+	description = "Publishes Gradle plugins to artifact repositories, and tags git with the version number"
+	dependsOn 'tagVcsWithVersionTag'
+}
+
+pluginManager.withPlugin('java-gradle-plugin') {
+	gradlePlugin.automatedPublishing = false
+}
+
+pluginManager.withPlugin('java') {
+	apply plugin: 'maven-publish'
+	project.apply plugin: com.jfrog.bintray.gradle.BintrayPlugin
+	
+	publishing {
+		publications {
+			main(MavenPublication) {
+				from components.java
+				artifact sourcesJar
+				//artifact javadocJar
+				
+				artifactId = project.moduleName
+			}
+		}
+	}
+	
+	bintray {
+		user = project.bintray_user
+		key = project.bintray_key
+		publish = true
+		publications = ['main']
+
+		pkg {
+			repo = 'uulib'
+			name = project.moduleName
+			userOrg = 'uulib'
+			desc = project.description
+			licenses = ['Apache-2.0']
+
+			websiteUrl = githubProjectUrl
+			vcsUrl = githubRepoUrl
+			githubRepo = githubRepoLocation
+
+			version {
+				name = project.version
+				vcsTag = gradletag.tags.versionTag.tag.toString()
+				released = new Date(rootProject.buildTime.toEpochMilli())
+			}
+		}
+	}
+	
+	tagVcsWithVersionTag.mustRunAfter bintrayUpload
+	release.dependsOn bintrayUpload
+}
+
+pluginManager.withPlugin('com.gradle.plugin-publish') {
+	pluginBundle {
+		website = githubProjectUrl
+		vcsUrl = githubRepoUrl
+		
+		mavenCoordinates {
+			group = project.group
+			artifactId = project.moduleName
+		}
+	}
+	
+	tagVcsWithVersionTag.mustRunAfter publishPlugins
+	release.dependsOn publishPlugins
+}

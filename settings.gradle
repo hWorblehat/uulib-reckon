@@ -1,9 +1,3 @@
-
 rootProject.name = 'reckon'
 
-
-['strategy', 'groovyDsl', 'gradlePlugin'].each { String projectName ->
-	include projectName
-	String dirName = projectName.replaceAll('\\p{Upper}') { "-${it.toLowerCase()}" }
-	project(":$projectName").projectDir = new File(settingsDir, dirName)
-}
+apply from: 'gradle/findSubprojects.gradle'

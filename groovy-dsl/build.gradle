@@ -3,6 +3,8 @@ plugins {
 	id 'groovy'
 }
 
+description = 'A groovy DSL for reckoning versions'
+
 configurations {
 	apiElements {
 		outgoing.variants.getByName('classes').artifact(

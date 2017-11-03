@@ -1,0 +1,11 @@
+// Settings script plugin to find and include subprojects
+
+File rootDir = buildscript.sourceFile.parentFile.parentFile
+
+rootDir.listFiles().each { File f ->
+	if(f.name!='buildSrc' && f.directory && (file("$f/build.gradle").file || file("$f/settings.gradle").file)) {
+		String prjName = f.name.replaceAll(/-(.)/) { all, letter -> letter.toUpperCase() }
+		include prjName
+		project(":$prjName").projectDir = f
+	}
+}

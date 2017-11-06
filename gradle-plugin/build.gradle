@@ -15,7 +15,7 @@ configurations {
 	}
 }
 
-description = 'Pluing to add UULIB Reckon functionality to Gradle builds'
+description = 'Plugin to add UULIB Reckon functionality to Gradle builds'
 ext.basePackage = 'org.uulib.reckon.gradle'
 
 apply from: 'dependencies.gradle'
